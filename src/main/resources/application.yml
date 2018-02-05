@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: dev
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai   
+    serialization:
+     write-dates-as-timestamps: false
+jwt:
+  header: Authorization
+  secret: 844defc6-30c3-43bf-b852-bc1cc6606118
+  expired: 3600000 # 超时时间:一小时,单位:毫秒
+
+swagger:
+  enabled: true
+  title: 后台api
+  version: v1
+  description: Starter for swagger 2.x
+  contact:
+    name: 大黄
+  base-path: /**
+  exclude-path: /error
+  global-operation-parameters:
+  - name: Authorization
+    description: 认证token
+    model-ref: string
+    parameter-type: header
+    required: true
