@@ -9,7 +9,7 @@ import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.swk.cpanel.api.bean.ResponseData;
-import com.swk.cpanel.api.config.constants.CodeMsgEnum;
+import com.swk.cpanel.api.config.constants.ResponseMsgEnum;
 import com.swk.cpanel.api.util.HttpUtil;
 
 public class JWTFilter extends BasicHttpAuthenticationFilter {
@@ -20,10 +20,10 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse=(HttpServletResponse) response;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         // 获取Authorization字段
         String token = httpServletRequest.getHeader(header);
-        if (token!=null) {
+        if (token != null) {
             try {
                 JWTToken jwtToken = new JWTToken(token);
                 // 提交给realm进行登入，如果错误他会抛出异常并被捕获
@@ -34,7 +34,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
             		return false;
             }
         } else {
-        		responseAuthProblem(httpServletResponse, CodeMsgEnum.UN_AUTHORIZED.name());
+        		responseAuthProblem(httpServletResponse, ResponseMsgEnum.UN_AUTHORIZED.name());
 	    		return false;
         }
     }
@@ -42,7 +42,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     /**
      * 响应认证错误信息
      */
-    private void responseAuthProblem(HttpServletResponse response,String codeMsgEnum) throws Exception {
-		HttpUtil.generateJsonResponse(response, ResponseData.codeMsg(CodeMsgEnum.valueOf(codeMsgEnum)));	 
+    private void responseAuthProblem(HttpServletResponse response, String codeMsgEnum) throws Exception {
+		HttpUtil.responseJson(response, ResponseData.responseMsg(ResponseMsgEnum.valueOf(codeMsgEnum)));	 
     }
 }

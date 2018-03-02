@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.swk.cpanel.api.bean.ResponseData;
-import com.swk.cpanel.api.config.constants.CodeMsgEnum;
+import com.swk.cpanel.api.config.constants.ResponseMsgEnum;
 
 @RestControllerAdvice
-public class CustomExceptionHandler {
+public class GlobalExceptionHandler {
 
     /**
      * 捕捉shiro异常
@@ -24,9 +24,9 @@ public class CustomExceptionHandler {
     @ExceptionHandler(ShiroException.class)
     public ResponseData<String> shiroException(ShiroException e) {
     		if(UnauthorizedException.class.isInstance(e)) {
-    			return ResponseData.codeMsg(CodeMsgEnum.ACCESS_FORBIDDEN);
+    			return ResponseData.responseMsg(ResponseMsgEnum.ACCESS_FORBIDDEN);
     		}
-    		return ResponseData.codeMsg(CodeMsgEnum.UN_AUTHORIZED);
+    		return ResponseData.responseMsg(ResponseMsgEnum.UN_AUTHORIZED);
     }
     
     /**
@@ -50,8 +50,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseData<String> globalException(HttpServletRequest request, Exception e) {
-//    		e.printStackTrace();
-        return ResponseData.empty(getStatus(request).value(),e.getMessage());
+        return ResponseData.codeMsg(getStatus(request).value(), e.getMessage());
     }
     
     private HttpStatus getStatus(HttpServletRequest request) {

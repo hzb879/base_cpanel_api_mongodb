@@ -11,6 +11,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +22,7 @@ import com.swk.cpanel.api.util.component.JsonUtil;
 
 public class HttpUtil {
 	
-	private static final String SERVER_IP=getMyServerIp();
+	private static final String SERVER_IP = getMyServerIp();
 	
 	/**
 	 * 把http请求输入转化为字符串
@@ -30,50 +31,53 @@ public class HttpUtil {
 	 * @throws Exception
 	 */
 	public static String getHttpInputStreamAsString(HttpServletRequest request) throws Exception{
-		InputStream inStream= request.getInputStream();
-		ByteArrayOutputStream outSteam= new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len = 0;
-        while ((len = inStream.read(buffer)) != -1) {
-            outSteam.write(buffer, 0, len);
-        }
-        outSteam.close();
-        inStream.close();
-		return outSteam.toString("utf-8");
+		try (InputStream inStream = request.getInputStream();
+			ByteArrayOutputStream outSteam = new ByteArrayOutputStream();) {
+			byte[] buffer = new byte[1024];
+	        int len = 0;
+	        while ((len = inStream.read(buffer)) != -1) {
+	            outSteam.write(buffer, 0, len);
+	        }
+	        return outSteam.toString("utf-8");
+		}
 	}
+	
 	/**
 	 * 获取客户端真实ip
 	 * @param request
 	 * @return
 	 */
 	public static String getClientIpAddress(HttpServletRequest request) {  
-        String ip = request.getHeader("x-forwarded-for");  
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
-            ip = request.getHeader("Proxy-Client-IP");  
-        }  
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
-            ip = request.getHeader("WL-Proxy-Client-IP");  
-        }  
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
-            ip = request.getHeader("HTTP_CLIENT_IP");  
-        }  
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");  
-        }  
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {  
-            ip = request.getRemoteAddr();  
-        }  
-        return ip;  
+		String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 如果是多级代理，那么取第一个ip为客户端ip
+        if (ip != null && ip.indexOf(",") != -1) {
+            ip = ip.substring(0, ip.indexOf(",")).trim();
+        }
+        return ip;
 	}  
 	
 	/**
 	 * 获取服务器端ip地址	
 	 * @return
 	 */
-	public static String getServerIp(){  
+	public static String getServerIpAddress(){  
 		return SERVER_IP;
 	}
-	
 	
 	/**
 	 * 通过paramsMap取出其中的键值对来构造url查询参数 如?a=b&c=d
@@ -81,11 +85,10 @@ public class HttpUtil {
 	 * @return
 	 */
 	public static String createQueryParams(MultiValueMap<String, String> params){
-		StringBuilder sb=new StringBuilder("?");
-		for(Map.Entry<String, List<String>> entry: params.entrySet()){
-			for(String val:entry.getValue()){
-				if(val == null || val.equals(""))
-					continue;
+		StringBuilder sb = new StringBuilder("?");
+		for(Map.Entry<String, List<String>> entry : params.entrySet()){
+			for(String val : entry.getValue()){
+				if(val == null || val.trim().equals("")) continue;
 				sb.append(entry.getKey()).append("=").append(val).append("&");
 			}
 		}
@@ -98,11 +101,60 @@ public class HttpUtil {
 	 * @return
 	 */
 	public static String createQueryParams(Map<String, String> params){
-		StringBuilder sb=new StringBuilder("?");
-		for(Map.Entry<String,String> entry: params.entrySet()){
-			sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+		StringBuilder sb = new StringBuilder("?");
+		for(Map.Entry<String,String> entry : params.entrySet()){
+			String value = entry.getValue();
+			if(value == null || value.trim().equals("")) continue;
+			sb.append(entry.getKey()).append("=").append(value).append("&");
 		}
 		return sb.substring(0, sb.length()-1);
+	}
+	
+	/**
+	 * 获取请求的查询参数串
+	 * @param request
+	 * @return
+	 */
+	public static String getQueryString(HttpServletRequest request) {
+		String qs = null;
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		if(Objects.nonNull(parameterMap) && !parameterMap.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			 for(String name : parameterMap.keySet()) {
+				 for(String value : parameterMap.get(name)) {
+					 sb.append(name).append("=").append(value).append("&");
+				 }
+			 }
+			 qs = sb.substring(0, sb.length()-1);
+		}
+		return qs;
+	}
+	
+	/**
+	 * 获取原始访问的url
+	 * @param request
+	 * @return
+	 */
+	public static String getPrimitiveRequestUrl(HttpServletRequest request) {
+		//获取原始访问路径,登录成功后重定向到该路径
+		String primitiveUri = request.getRequestURI();
+		String qs = HttpUtil.getQueryString(request);
+		if(Objects.nonNull(qs)) {
+			primitiveUri += ("?" + qs);
+		}
+		return primitiveUri;
+	}
+	
+	public static void responseJson(HttpServletResponse response,Object responseData) throws IOException {
+		response.setContentType("application/json;charset=UTF-8");
+		try(PrintWriter writer = response.getWriter()){
+			writer.write(JsonUtil.createJson(responseData));
+		}
+	}
+	
+	public static boolean isAjaxRequest(HttpServletRequest request) {
+		return request.getHeader("X-Requested-With") !=null && 
+				request.getHeader("X-Requested-With").equalsIgnoreCase("XMLHttpRequest");
 	}
 	
 	/**
@@ -110,7 +162,7 @@ public class HttpUtil {
 	 * @return
 	 */
 	private static String getMyServerIp(){  
-		 String serverIp ="";
+		 String serverIp = "";
 	        // 根据网卡取本机配置的IP  
 	        Enumeration<NetworkInterface> allNetInterfaces;  //定义网络接口枚举类  
 	        try {  
@@ -136,13 +188,5 @@ public class HttpUtil {
 	        }
 	        return serverIp;  
 	}  
-	
-	public static void generateJsonResponse(HttpServletResponse response,Object responseData) throws IOException {
-		response.setContentType("application/json;charset=UTF-8");
-		try(PrintWriter writer = response.getWriter()){
-			writer.write(JsonUtil.createJson(responseData));
-		}
-	}
-	
 	
 }

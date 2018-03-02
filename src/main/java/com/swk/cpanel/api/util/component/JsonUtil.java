@@ -24,62 +24,66 @@ public class JsonUtil {
 	
 	 @PostConstruct  
 	 public void init() {  
-		 mapper=this.globalMapper;
+		 mapper = this.globalMapper;
 	 }  
 	
-	public static JsonNode parseJson(String json) {
-		JsonNode node = null;
-		try {
-			node = mapper.readTree(json);
-		} catch (IOException e) {
-			e.printStackTrace();
+	 public static JsonNode parseJson(String json) {
+			JsonNode node = null;
+			try {
+				node = mapper.readTree(json);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return node;
 		}
-		return node;
-	}
-	public static ObjectNode parseToObjectNode(String json) {
-		ObjectNode node = null;
-		try {
-			node = (ObjectNode) mapper.readTree(json);
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		public static ObjectNode parseToObjectNode(String json) {
+			ObjectNode node = null;
+			try {
+				node = (ObjectNode) mapper.readTree(json);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return node;
 		}
-		return node;
-	}
-	public static ArrayNode parseToArrayNode(String json) {
-		ArrayNode node = null;
-		try {
-			node = (ArrayNode) mapper.readTree(json);
-		} catch (IOException e) {
-			e.printStackTrace();
+		public static ArrayNode parseToArrayNode(String json) {
+			ArrayNode node = null;
+			try {
+				node = (ArrayNode) mapper.readTree(json);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return node;
 		}
-		return node;
-	}
-	public static String createJson(Object obj){
-		String jsonStr = null;
-		try {
-			jsonStr = mapper.writeValueAsString(obj);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+		
+		public static String createJson(Object obj){
+			String jsonStr = null;
+			try {
+				jsonStr = mapper.writeValueAsString(obj);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return jsonStr;
 		}
-		return jsonStr;
-	}
-	public static <T> T readAsSimpleObj(String jsonStr,Class<T> objClass){
-		T t=null;
-		try {
-			t=mapper.readValue(jsonStr, objClass);
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		public static <T> T parseAsSimpleObj(String jsonStr, Class<T> objClass){
+			T t = null;
+			try {
+				t = mapper.readValue(jsonStr, objClass);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return t;
 		}
-		return t;
-	}
-	public static <T> T readAsComplexObj(String jsonStr,TypeReference<T> typeReference){
-		T t=null;
-		try {
-			t= mapper.readValue(jsonStr, typeReference);
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		public static <T> T parseAsComplexObj(String jsonStr, TypeReference<T> typeReference){
+			T t=null;
+			try {
+				t = mapper.readValue(jsonStr, typeReference);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return t;
 		}
-		return t;
-	}
 	
 }

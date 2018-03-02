@@ -6,6 +6,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,10 +39,11 @@ public class UserController {
 	public ResponseData<Page<User>> findAll(
 			 @PageableDefault(page=0,size=10) Pageable pageable,
 			@RequestParam(required=false) String nickname) {
-		return ResponseData.success(userService.getAll(MongoQueryUtil
-				.queryBuilder(pageable)
-				.addSimpleRegexCriteria("nickname", nickname)
-				.build(), pageable));
+		Query query = MongoQueryUtil
+						.queryBuilder(pageable)
+						.regex("nickname", nickname)
+						.build();
+		return ResponseData.success(userService.getAll(query, pageable));
 	}
 	
 	@ApiOperation(value="获取用户个人信息")

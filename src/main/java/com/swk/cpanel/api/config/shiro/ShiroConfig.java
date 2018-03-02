@@ -17,9 +17,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 /**
  * shiro配置
@@ -28,22 +25,6 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 public class ShiroConfig {
-	
-	/**
-	 * 跨域配置
-	 * @return
-	 */
-	@Bean
-	public CorsFilter corsFilter(){
-		UrlBasedCorsConfigurationSource configSource=new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config=new CorsConfiguration();
-		config.addAllowedHeader("*");
-		config.addAllowedOrigin("*");
-		config.addAllowedMethod("*");
-		configSource.registerCorsConfiguration("/**", config);
-		return new CorsFilter(configSource);
-	}
-	
 	
 	/**
 	 * 认证与授权资源信息
@@ -104,7 +85,6 @@ public class ShiroConfig {
 	@Bean
 	public ShiroFilterFactoryBean shiroFilterFactoryBean(JWTFilter jwtFilter,SecurityManager securityManager) throws Exception {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-		
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
 		
 		//设置自定义加强的过滤器

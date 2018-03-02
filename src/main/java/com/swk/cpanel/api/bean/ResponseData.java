@@ -1,6 +1,6 @@
 package com.swk.cpanel.api.bean;
 
-import com.swk.cpanel.api.config.constants.CodeMsgEnum;
+import com.swk.cpanel.api.config.constants.ResponseMsgEnum;
 
 public class ResponseData<T> {
 	
@@ -16,23 +16,33 @@ public class ResponseData<T> {
 	}
 	
 	public static <T> ResponseData<T> success(T data) {
-		CodeMsgEnum success = CodeMsgEnum.SUCCESS;
-		return new ResponseData<T>(success.getCode()	, success.getMsg(), data);
+		ResponseMsgEnum success = ResponseMsgEnum.SUCCESS;
+		return new ResponseData<T>(success.getCode(), success.getMsg(), data);
 	}
 	
 	public static <T> ResponseData<T> fail(T data) {
-		CodeMsgEnum fail = CodeMsgEnum.FAIL;
-		return new ResponseData<T>(fail.getCode(),fail.getMsg(),data);
+		ResponseMsgEnum fail = ResponseMsgEnum.FAIL;
+		return new ResponseData<T>(fail.getCode(), fail.getMsg(), data);
 	}
 	
-	public static ResponseData<String> codeMsg(CodeMsgEnum codeMsgEnum) {
-		return new ResponseData<String>(codeMsgEnum.getCode(),codeMsgEnum.getMsg(),codeMsgEnum.getMsg());
+	public static ResponseData<String> successSign() {
+		ResponseMsgEnum success = ResponseMsgEnum.SUCCESS;
+		return new ResponseData<>(success.getCode(), success.getMsg(), success.getMsg());
 	}
 	
-	public static ResponseData<String> empty(Integer code, String message) {
+	public static ResponseData<String> failSign() {
+		ResponseMsgEnum fail = ResponseMsgEnum.FAIL;
+		return new ResponseData<>(fail.getCode(), fail.getMsg(), fail.getMsg());
+	}
+	
+	public static ResponseData<String> responseMsg(ResponseMsgEnum responseMsgEnum) {
+		return new ResponseData<String>(responseMsgEnum.getCode(), responseMsgEnum.getMsg(), responseMsgEnum.getMsg());
+	}
+	
+	public static ResponseData<String> codeMsg(Integer code, String message) {
 		return new ResponseData<String>(code, message, message);
 	}
-
+	
 	public Integer getCode() {
 		return code;
 	}

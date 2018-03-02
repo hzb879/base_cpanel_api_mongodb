@@ -14,7 +14,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.swk.cpanel.api.config.constants.CodeMsgEnum;
+import com.swk.cpanel.api.config.constants.ResponseMsgEnum;
 import com.swk.cpanel.api.entity.User;
 import com.swk.cpanel.api.exception.ServiceException;
 import com.swk.cpanel.api.service.UserService;
@@ -67,16 +67,16 @@ public class JWTRealm extends AuthorizingRealm {
         try {
         		Object idClaim =JwtUtil.parseJWT(token, secret).get("id");
         		if(idClaim == null) {
-        			throw new AuthenticationException(CodeMsgEnum.MISS_INFO_TOKEN.name());
+        			throw new AuthenticationException(ResponseMsgEnum.MISS_INFO_TOKEN.name());
         		}
-        		id =idClaim.toString();
+        		id = idClaim.toString();
         		if(Objects.isNull(userService.getById(id))) {
-        			  throw new AuthenticationException(CodeMsgEnum.USER_MISS_TOKEN.name());
+        			  throw new AuthenticationException(ResponseMsgEnum.USER_MISS_TOKEN.name());
         		}
         }catch(ExpiredJwtException e) {
-        		throw new AuthenticationException(CodeMsgEnum.EXPIRED_TOKEN.name());
+        		throw new AuthenticationException(ResponseMsgEnum.EXPIRED_TOKEN.name());
         }catch(JwtException e) {
-        		throw new AuthenticationException(CodeMsgEnum.INVALID_TOKEN.name());
+        		throw new AuthenticationException(ResponseMsgEnum.INVALID_TOKEN.name());
         }
         return new SimpleAuthenticationInfo(id, token, getName());
     }

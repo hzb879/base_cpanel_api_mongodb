@@ -17,9 +17,9 @@ public class ShiroEncryptUtil {
 	
 	public static final String ALGORITHM_NAME = "md5";
 	
-	private static RandomNumberGenerator randomNumberGenerator=new SecureRandomNumberGenerator();
+	private static RandomNumberGenerator randomNumberGenerator = new SecureRandomNumberGenerator();
 	
-	public static final int DEFAULT_HASH_ITERATIONS=12;
+	public static final int DEFAULT_HASH_ITERATIONS = 12;
 	
 	
 	/**
@@ -37,7 +37,7 @@ public class ShiroEncryptUtil {
 	 * @param hashIterations 散列次数
 	 * @return 盐和新密码
 	 */
-	public static SaltPwd encryptPwdWithRandomSalt(String oldPassword,int hashIterations) {
+	public static SaltPwd encryptPwdWithRandomSalt(String oldPassword, int hashIterations) {
 		String salt=randomNumberGenerator.nextBytes().toHex();
 		return new SaltPwd(salt, new SimpleHash(ALGORITHM_NAME, oldPassword, ByteSource.Util.bytes(salt), hashIterations).toHex());
 	}
@@ -49,7 +49,7 @@ public class ShiroEncryptUtil {
 	 * @param salt 盐
 	 * @return
 	 */
-	public static boolean verifyPassword(String password,String encryptPassword,String salt) {
+	public static boolean verifyPassword(String password, String encryptPassword, String salt) {
 		return verifyPassword(password, encryptPassword, salt, DEFAULT_HASH_ITERATIONS);
 	}
 	
@@ -62,7 +62,7 @@ public class ShiroEncryptUtil {
 	 * @param hashIterations 散列次数
 	 * @return
 	 */
-	public static boolean verifyPassword(String password,String encryptPassword,String salt,int hashIterations) {
+	public static boolean verifyPassword(String password, String encryptPassword, String salt, int hashIterations) {
 		return new SimpleHash(ALGORITHM_NAME, password, ByteSource.Util.bytes(salt), hashIterations).toHex().equals(encryptPassword);
 	}
 	

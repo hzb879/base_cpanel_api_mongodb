@@ -15,9 +15,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
+@ApiModel("用户基本信息")
 @EqualsAndHashCode(callSuper=true)
 @Document(collection="users")
-@ApiModel("用户基本信息")
 public class User extends BaseEntity{
 	
 	@ApiModelProperty("用户名")
